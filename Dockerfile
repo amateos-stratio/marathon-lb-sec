@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         inetutils-syslogd \
         iptables \
-        libcurl3 \
+        libcurl4 \
         liblua5.3-0 \
         libssl1.0.2 \
         openssl \
@@ -36,7 +36,7 @@ RUN set -x \
     && wget -O tini "https://github.com/krallin/tini/releases/download/$TINI_VERSION/tini-amd64" \
     && wget -O tini.asc "https://github.com/krallin/tini/releases/download/$TINI_VERSION/tini-amd64.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys "$TINI_GPG_KEY" \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$TINI_GPG_KEY" \
     && gpg --batch --verify tini.asc tini \
     && rm -rf "$GNUPGHOME" tini.asc \
     && mv tini /usr/bin/tini \

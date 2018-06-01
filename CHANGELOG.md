@@ -2,6 +2,7 @@
 
 ## 0.4.0 (upcoming)
 
+* Fix curl dependency and gpg keyserver in Dockerfile
 * [EOS-1074] Fix to tcplog format in tcp backends
 * Fix isolate failed backends when regenerating config
 
