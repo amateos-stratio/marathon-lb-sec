@@ -37,6 +37,9 @@ RUN set -x \
     && wget -O tini.asc "https://github.com/krallin/tini/releases/download/$TINI_VERSION/tini-amd64.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$TINI_GPG_KEY" \
+    || gpg --keyserver pool.sks-keyservers.net --recv-keys "$TINI_GPG_KEY" \
+    || gpg --keyserver keyserver.pgp.com --recv-keys "$TINI_GPG_KEY" \
+    || gpg --keyserver pgp.mit.edu --recv-keys "$TINI_GPG_KEY" \
     && gpg --batch --verify tini.asc tini \
     && rm -rf "$GNUPGHOME" tini.asc \
     && mv tini /usr/bin/tini \
