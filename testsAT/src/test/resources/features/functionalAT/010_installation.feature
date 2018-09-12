@@ -1,13 +1,13 @@
 @rest
 Feature: Installation testing with marathon-lb-sec
 
-  Scenario: Install marathon-lb-sec
+  Scenario: [Install Marathon-lb][01] Version 0.3.1
+    #Misma configuracion para 0.4.0-SNAPSHOT
     Given I open a ssh connection to '${BOOTSTRAP_IP}' with user '${REMOTE_USER:-operador}' using pem file 'src/test/resources/credentials/${PEM_FILE:-key.pem}'
     And I run 'grep -Po '"root_token":\s*"(\d*?,|.*?[^\\]")' /stratio_volume/vault_response | awk -F":" '{print $2}' | sed -e 's/^\s*"//' -e 's/"$//'' in the ssh connection and save the value in environment variable 'vaultToken'
     And I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER:-admin}' with user '${REMOTE_USER:-operador}' and pem file 'src/test/resources/credentials/${PEM_FILE:-key.pem}'
-    And I open a ssh connection to '${DCOS_CLI_HOST:-dcos-cli.demo.labs.stratio.com}' with user '${CLI_USER:-root}' and password '${CLI_PASSWORD:-stratio}'
-    And I securely send requests to '${DCOS_IP}:443'
-    And I create file 'config.json' based on 'schemas/marathon-lb-sec-config.json' as 'json' with:
+    And I securely send requests to '${CLUSTER_ID}.labs.stratio.com:443'
+    When I create file 'config.${MARATHON_LB_VERSION:-0.3.1}.json' based on 'schemas/marathon-lb-sec-config.json' as 'json' with:
       | $.marathon-lb.auto-assign-service-ports      | REPLACE | ${AUTO_ASSIGN_SERVICE_PORTS:-false}                                                                                                                                                                 | boolean |
       | $.marathon-lb.bind-http-https                | REPLACE | ${BIND_HTTP_HTTPS:-true}                                                                                                                                                                            | boolean |
       | $.marathon-lb.cpus                           | REPLACE | ${CPUS:-2}                                                                                                                                                                                          | number  |
@@ -29,20 +29,27 @@ Feature: Installation testing with marathon-lb-sec
       | $.marathon-lb.vault_token                    | UPDATE  | !{vaultToken}                                                                                                                                                                                       | n/a     |
       | $.marathon-lb.instance_app_role              | UPDATE  | ${INSTANCE_APP_ROLE:-open}                                                                                                                                                                          | n/a     |
 
-    And I outbound copy 'target/test-classes/config.json' through a ssh connection to '/tmp'
-    When I run 'dcos package install --yes --app --options=/tmp/config.json ${PACKAGE:-marathon-lb-sec}' in the ssh connection
+  Scenario: [Install Marathon-lb][02] Install using config file and cli
+    #Copy DEPLOY JSON to DCOS-CLI
+    Given I open a ssh connection to '${DCOS_CLI_HOST:-dcos-cli.demo.stratio.com}' with user '${CLI_USER:-root}' and password '${CLI_PASSWORD:-stratio}'
+    When I outbound copy 'target/test-classes/config.${MARATHON_LB_VERSION:-0.3.1}.json' through a ssh connection to '/tmp/'
+    And I run 'dcos package install --yes --package-version=${MARATHON_LB_VERSION:-0.3.1} --options=/tmp/config.${MARATHON_LB_VERSION:-0.3.1}.json ${PACKAGE:-marathon-lb-sec}' in the ssh connection
     Then the command output contains 'Marathon-lb DC/OS Service has been successfully installed!'
+    And I run 'rm -f /tmp/config.${MARATHON_LB_VERSION:-0.3.1}.json' in the ssh connection
+
+  Scenario: [Install Marathon][03][01] Check Marathon-lb has being installed correctly
+    Given I open a ssh connection to '${DCOS_CLI_HOST:-dcos-cli.demo.stratio.com}' with user '${CLI_USER:-root}' and password '${CLI_PASSWORD:-stratio}'
     And in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep -w ${SERVICE:-marathon-lb-sec}. | wc -l' contains '1'
     When I run 'dcos marathon task list ${SERVICE:-marathon-lb-sec} | awk '{print $5}' | grep ${SERVICE:-marathon-lb-sec}' in the ssh connection and save the value in environment variable 'marathonTaskId'
     # DCOS dcos marathon task show check healtcheck status
     Then in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
     And in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep '"alive": true' | wc -l' contains '1'
 
-  Scenario: Obtain node where marathon-lb-sec is running
+  Scenario: [Install Marathon][03][02] Obtain node where marathon-lb-sec is running
     Given I open a ssh connection to '${DCOS_CLI_HOST:-dcos-cli.demo.labs.stratio.com}' with user '${CLI_USER:-root}' and password '${CLI_PASSWORD:-stratio}'
-    When I run 'dcos task | grep ${SERVICE:-marathon-lb-sec}. | awk '{print $2}'' in the ssh connection and save the value in environment variable 'publicHostIP'
+    When I run 'dcos task | grep ${SERVICE:-marathon-lb-sec} | awk '{print $2}'' in the ssh connection and save the value in environment variable 'publicHostIP'
 
-  Scenario: Make sure service is ready
+  Scenario: [Install Marathon][03][03] Make sure service is ready
     Given I send requests to '!{publicHostIP}:9090'
     When I send a 'GET' request to '/_haproxy_health_check'
     Then the service response status must be '200'
