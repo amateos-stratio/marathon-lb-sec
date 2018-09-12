@@ -3,7 +3,7 @@
 Feature: [MARATHONLB-1386] Deploying marathon-lb-sec with an nginx certificate
 #Installing marathon-lb-sec with Nginx certificate
   @runOnEnv(INSTALL_MARATHON=true)
-  @include(feature:../010_installation.feature,scenario:[Install Marathon-lb][01] Version 0.3.1)
+  @include(feature:../010_installation.feature,scenario:[Install Marathon-lb][01])
   @include(feature:../010_installation.feature,scenario:[Install Marathon-lb][02] Install using config file and cli)
   @include(feature:../010_installation.feature,scenario:[Install Marathon][03][01] Check Marathon-lb has being installed correctly)
   @include(feature:../010_installation.feature,scenario:[Install Marathon][03][02] Obtain node where marathon-lb-sec is running)

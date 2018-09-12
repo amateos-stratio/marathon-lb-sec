@@ -1,7 +1,7 @@
 @rest
 Feature: Installation testing with marathon-lb-sec
 
-  Scenario: [Install Marathon-lb][01] Version 0.3.1
+  Scenario: [Install Marathon-lb][01]
     #Misma configuracion para 0.4.0-SNAPSHOT
     Given I open a ssh connection to '${BOOTSTRAP_IP}' with user '${REMOTE_USER:-operador}' using pem file 'src/test/resources/credentials/${PEM_FILE:-key.pem}'
     And I run 'grep -Po '"root_token":\s*"(\d*?,|.*?[^\\]")' /stratio_volume/vault_response | awk -F":" '{print $2}' | sed -e 's/^\s*"//' -e 's/"$//'' in the ssh connection and save the value in environment variable 'vaultToken'
@@ -33,7 +33,7 @@ Feature: Installation testing with marathon-lb-sec
     #Copy DEPLOY JSON to DCOS-CLI
     Given I open a ssh connection to '${DCOS_CLI_HOST:-dcos-cli.demo.stratio.com}' with user '${CLI_USER:-root}' and password '${CLI_PASSWORD:-stratio}'
     When I outbound copy 'target/test-classes/config.${MARATHON_LB_VERSION:-0.3.1}.json' through a ssh connection to '/tmp/'
-    And I run 'dcos package install --yes --package-version=${MARATHON_LB_VERSION:-0.3.1} --options=/tmp/config.${MARATHON_LB_VERSION:-0.3.1}.json ${PACKAGE:-marathon-lb-sec}' in the ssh connection
+    And I run 'dcos package install --yes --package-version=${MARATHON_LB_VERSION:-0.3.1} --options=/tmp/config.${MARATHON_LB_VERSION:-0.3.1}.json ${PACKAGE_MARATHON_LB:-marathon-lb-sec}' in the ssh connection
     Then the command output contains 'Marathon-lb DC/OS Service has been successfully installed!'
     And I run 'rm -f /tmp/config.${MARATHON_LB_VERSION:-0.3.1}.json' in the ssh connection
 
