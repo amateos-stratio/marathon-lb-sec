@@ -8,8 +8,8 @@
 
 ## Pruebas
 
-##### Nightly
-`mvn clean verify -Dgroups=nightly -DDCOS_CLI_HOST=dcos-nightly -DDCOS_IP=10.200.0.156 -DCLUSTER_SSO=nightly.labs.stratio.com -DBOOTSTRAP_IP=10.200.0.155 -DCLUSTER_ID=nightly -DMLB_FLAVOUR=andromeda`
+##### Nightly CC
+'mvn clean verify -Dgroups=nightly -DDCOS_CLI_HOST=dcos-cli-nightly -DDCOS_IP=10.200.0.156 -DCLUSTER_SSO=nightly.labs.stratio.com -DBOOTSTRAP_IP=10.200.0.155 -DCLUSTER_ID=nightly -DMLB_FLAVOUR=pegaso -DlogLevel=DEBUG -DVAULT_HOST=vault.service.paas.labs.stratio.com'
 
 ##### iptables
 `mvn clean verify -Dgroups=iptables -DDCOS_CLI_HOST=dcos-nightly -DDCOS_IP=10.200.0.156 -DCLUSTER_SSO=nightly.labs.stratio.com -DBOOTSTRAP_IP=10.200.0.155 -DCLUSTER_ID=nightly`

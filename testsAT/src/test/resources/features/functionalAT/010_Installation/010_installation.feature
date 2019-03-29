@@ -18,7 +18,7 @@ Feature: Installation testing with marathon-lb-sec
       | $.marathon-lb.mem                            | REPLACE | ${MEM:-1024.0}                                                                                                                                                                                      | number  |
       | $.marathon-lb.minimumHealthCapacity          | REPLACE | ${MINIMUN_HEALTH_CAPACITY:-0.5}                                                                                                                                                                     | number  |
       | $.marathon-lb.maximumOverCapacity            | REPLACE | ${MAXIMUN_OVER_CAPACITY:-0.2}                                                                                                                                                                       | number  |
-      | $.marathon-lb.name                           | UPDATE  | ${SERVICE:-marathon-lb-sec}                                                                                                                                                                         | n/a     |
+      | $.marathon-lb.name                           | UPDATE  | ${SERVICE:-marathonlb}                                                                                                                                                                         | n/a     |
       | $.marathon-lb.role                           | UPDATE  | ${ROLE:-slave_public}                                                                                                                                                                               | n/a     |
       | $.marathon-lb.strict-mode                    | REPLACE | ${STRICT_MODE:-false}                                                                                                                                                                               | boolean |
       | $.marathon-lb.sysctl-params                  | UPDATE  | ${SYSCTL_PARAMS:-net.ipv4.tcp_tw_reuse=1 net.ipv4.tcp_fin_timeout=30 net.ipv4.tcp_max_syn_backlog=10240 net.ipv4.tcp_max_tw_buckets=400000 net.ipv4.tcp_max_orphans=60000 net.core.somaxconn=10000} | n/a     |
@@ -39,15 +39,15 @@ Feature: Installation testing with marathon-lb-sec
 
   Scenario: [Install Marathon][03][01] Check Marathon-lb has being installed correctly
     Given I open a ssh connection to '${DCOS_CLI_HOST:-dcos-cli.demo.stratio.com}' with user '${CLI_USER:-root}' and password '${CLI_PASSWORD:-stratio}'
-    And in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep -w ${SERVICE:-marathon-lb-sec}. | wc -l' contains '1'
-    When I run 'dcos marathon task list ${SERVICE:-marathon-lb-sec} | awk '{print $5}' | grep ${SERVICE:-marathon-lb-sec}' in the ssh connection and save the value in environment variable 'marathonTaskId'
+    And in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep -w ${SERVICE:-marathonlb}. | wc -l' contains '1'
+    When I run 'dcos marathon task list ${SERVICE:-marathonlb} | awk '{print $5}' | grep ${SERVICE:-marathonlb}' in the ssh connection and save the value in environment variable 'marathonTaskId'
     # DCOS dcos marathon task show check healtcheck status
     Then in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
     And in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep '"alive": true' | wc -l' contains '1'
 
   Scenario: [Install Marathon][03][02] Obtain node where marathon-lb-sec is running
     Given I open a ssh connection to '${DCOS_CLI_HOST:-dcos-cli.demo.labs.stratio.com}' with user '${CLI_USER:-root}' and password '${CLI_PASSWORD:-stratio}'
-    When I run 'dcos task | grep ${SERVICE:-marathon-lb-sec} | awk '{print $2}'' in the ssh connection and save the value in environment variable 'publicHostIP'
+    When I run 'dcos task | grep ${SERVICE:-marathonlb} | awk '{print $2}'' in the ssh connection and save the value in environment variable 'publicHostIP'
 
   Scenario: [Install Marathon][03][03] Make sure service is ready
     Given I send requests to '!{publicHostIP}:9090'

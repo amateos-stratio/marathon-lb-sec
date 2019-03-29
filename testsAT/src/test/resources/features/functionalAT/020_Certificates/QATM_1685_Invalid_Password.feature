@@ -24,7 +24,7 @@ Feature: Marathon-lb not able to run without valid password in Vault for Maratho
     And I run 'rm -f /tmp/config.${MARATHON_LB_VERSION:-0.3.1}.json' in the ssh connection
     And I wait '45' seconds
 #    Marathon-lb-sec is not installed because passwords for marathon are incorrect
-    And in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep -w ${SERVICE:-marathon-lb-sec}. | wc -l' contains '0'
+    And in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep -w ${SERVICE:-marathonlb}. | wc -l' contains '0'
 
   Scenario: Restore Password for Marathon - mesos and rest
     Given I open a ssh connection to '${BOOTSTRAP_IP}' with user 'root' and password 'stratio'
